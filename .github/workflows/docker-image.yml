@@ -15,8 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: elraro/free-asterisk-arm
-          fetch-depth: 0
+          repository: elraro/freepbx-asterisk-arm
           token: ${{ github.token }}
   build:
     runs-on: ubuntu-latest
