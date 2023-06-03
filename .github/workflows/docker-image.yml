@@ -8,19 +8,9 @@ on:
     branches: [ "master" ]
 
 jobs:
-  info:
-    runs-on: ubuntu-latest
-    name: Get repository information
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          repository: elraro/freepbx-asterisk-arm
-          token: ${{ github.token }}
   build:
     runs-on: ubuntu-latest
     name: Build image
-    needs: [info]
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -39,6 +29,11 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          repository: elraro/freepbx-asterisk-arm
+          token: ${{ github.token }}
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
