@@ -39,5 +39,5 @@ jobs:
         with:
           push: true
           context: .
-          platforms: linux/arm/v8
+          platforms: linux/arm64
           tags: elraro/freepbx-asterisk-arm:latest
