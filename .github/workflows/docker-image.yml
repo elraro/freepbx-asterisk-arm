@@ -40,4 +40,4 @@ jobs:
           push: true
           context: .
           platforms: linux/arm64
-          tags: ${{ env.REGISTRY }}/elraro/freepbx-asterisk-arm/freepbx-asterisk-arm:latest
+          tags: ${{ env.REGISTRY }}/${{ github.repository }}:latest
