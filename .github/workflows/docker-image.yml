@@ -2,10 +2,9 @@ name: Docker Image CI
 env:
   REGISTRY: ghcr.io
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch:
+  release:
+    types: [released]
 
 jobs:
   build:
