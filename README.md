@@ -1,10 +1,8 @@
 # FreePBX and Asterisk on Docker (Raspberry Pi 4).
-
 Based on https://github.com/epandi/tiredofit-freepbx-arm 
 Thank you [Dave Conroy](https://github.com/tiredofit).
 
 # Introduction
-
 This will build a container for [FreePBX](https://www.freepbx.org/) - A Voice over IP manager for Asterisk. Upon starting this image it will give you a turn-key PBX system for SIP calling.
 
     Latest release FreePBX 16
@@ -29,13 +27,13 @@ This will build a container for [FreePBX](https://www.freepbx.org/) - A Voice ov
 3. [Table of Contents](#table-of-contents)
 4. [Prerequisites](prerequisites)
 5. [Installation](#installation)
-5.1 [Quick Start](#quick-start)
+   1. [Quick Start](#quick-start)
 6. [Configuration](#configuration)
-6.1 [Data Volumes](#data-volumes)
-6.2 [Environment Variables](#environment-variables)
-6.3 [Networking](#networking)
+   1. [Data Volumes](#data-volumes)
+   2. [Environment Variables](#environment-variables)
+   3. [Networking](#networking)
 7. [Maintenance](#maintenance)
-7.1 [Shell Access](#shell-access)
+   1. [Shell Access](#shell-access)
 8. [References](#references)
 
 # Prerequisites
@@ -43,6 +41,29 @@ This will build a container for [FreePBX](https://www.freepbx.org/) - A Voice ov
 This image assumes that you are using a reverse proxy such as [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) and optionally the Let's Encrypt Proxy Companion @ https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion in order to serve your pages. However, it will run just fine on it's own if you map appropriate ports.
 
 You will also need an external MySQL/MariaDB container, although it can use an internally provided service (not recommended).
+
+# Installation
+
+Automated builds of the image are available on [Github](https://github.com/elraro/freepbx-asterisk-arm/pkgs/container/freepbx-asterisk-arm) and is the recommended method of installation.
+
+    docker pull elraro/freepbx-asterisk-arm:(imagetag)
+
+The following image tags are available:
+
+* `latest` - Asterisk 18, Freepbx 15 - Ubuntu Focal
+
+You can also visit the image tags section on [Github](https://github.com/elraro/freepbx-asterisk-arm/pkgs/container/freepbx-asterisk-arm) to pull a version that follows the CHANGELOG.
+
+## Quick Start
+
+* The quickest way to get started is using [docker-compose](https://github.com/elraro/freepbx-asterisk-arm/blob/master/docker-compose.yaml). See the example's folder for a working docker-compose.yml that can be modified for development or production use.
+* Set various environment variables to understand the capabilities of this image.
+* Map persistent storage for access to configuration and data files for backup.
+* Make networking ports available for public access if necessary
+
+The first boot can take from 3 minutes - 30 minutes depending on your internet connection as there is a considerable amount of downloading to do!
+
+Login to the web server's admin URL (default /admin) and enter in your admin username, admin password, and email address and start configuring the system!
 
 Properly working with IVR and call forwarding to an extension on a Raspberry pi 4 32-bit architecture.
 
