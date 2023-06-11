@@ -57,118 +57,104 @@ You can also visit the image tags section on [Github](https://github.com/elraro/
 ## Quick Start
 
 * The quickest way to get started is using [docker-compose](https://github.com/elraro/freepbx-asterisk-arm/blob/master/docker-compose.yaml). See the example's folder for a working docker-compose.yml that can be modified for development or production use.
-* Set various environment variables to understand the capabilities of this image.
-* Map persistent storage for access to configuration and data files for backup.
-* Make networking ports available for public access if necessary
+* Set various [environment variables](#environment-variables) to understand the capabilities of this image.
+* Map [persistent storage](#data-volumes) for access to configuration and data files for backup.
+* Make [networking ports](#networking) available for public access if necessary
 
 The first boot can take from 3 minutes - 30 minutes depending on your internet connection as there is a considerable amount of downloading to do!
 
 Login to the web server's admin URL (default /admin) and enter in your admin username, admin password, and email address and start configuring the system!
 
-Properly working with IVR and call forwarding to an extension on a Raspberry pi 4 32-bit architecture.
+# Configuration
 
-Quick tips:
-No 2-way sound on outgoing calls but sound is available on inbound calls? Check if the RTP start/end ports in "Settings - Asterisk SIP Settings" match the ports defined in the docker-compose file.
-Check documentation on: https://hub.docker.com/r/tiredofit/freepbx
+## Data-Volumes
 
-Changelog:
-01-03-2023 - Builds in https://github.com/elraro/freepbx-asterisk-arm/pkgs/container/freepbx-asterisk-arm
-26-03-2021 - tag 18.15-alpha:
+The container supports data persistence and during Dockerfile build creates symbolic links for `/var/lib/asterisk`, `/var/spool/asterisk`, `/home/asterisk`, and `/etc/asterisk`. Upon startup configuration files are copied and generated to support portability.
 
-Asterisk 18.3.0
-FreePBX 15.0.17.24
-PHP 7.3
-Tested with IVR / Queues / Conferences
-24-03-2021 - tag 17.15.2 / 17.15-latest:
+The following directories are used for configure and can be mapped for persistent storage.
 
-updated Asterisk to 17.9.3
-FreePBX 15.0.16.56
-PHP 5.6
-ODBC mariadb driver updated to self compiled version instead of using the deprecated mysql driver
-XMPP is now installing and the daemon is running after integrating an armv7 mongodb supported version and tweeking some startup scripts
-Not working:
-FOP - automatic intallation script can't find the proper package.
-Example docker-compose.yaml (change tag to 18.15-alpha instead of 17.15-latest, if you want Asterisk 18 instead of Asterisk 17)
+| Directory        | Description                                                             |
+|:----------------:|:-----------------------------------------------------------------------:|
+| `/certs`         | Drop your certificates here for TLS w/PJSIP / UCP / HTTPd/ FOP          |
+| `/var/www/html`  | FreePBX web files                                                       |
+| `/var/log/`      | Apache, Asterisk and FreePBX Log Files                                  |
+| `/data`          | Data persistence for Asterisk and FreePBX and FOP                       |
+| `/assets/custom` | *OPTIONAL* - If you would like to overwrite some files in the container |
 
-```
-version: '2'
+## Environment Variables
 
-services:
-  freepbx-app:
-    container_name: freepbx-app
-    image: epandi/asterisk-freepbx-arm:17.15-latest
-    ports:
-     #### If you aren't using a reverse proxy
-      - 80:80
-     #### If you want SSL Support and not using a reverse proxy
-     #- 443:443
-      - 5060:5060/udp
-      - 5160:5160/udp
-      - 18000-18100:18000-18100/udp
-     #### Flash Operator Panel
-      - 4445:4445
-    volumes:
-      - /home/pi/Docker/asterisk17/certs:/certs
-      - /home/pi/Docker/asterisk17/data:/data
-      - /home/pi/Docker/asterisk17/logs:/var/log
-      - /home/pi/Docker/asterisk17/data/www:/var/www/html
-     ### Only Enable this option below if you set DB_EMBEDDED=TRUE
-      - /home/pi/Docker/asterisk17/db:/var/lib/mysql
-     ### You can drop custom files overtop of the image if you have made modifications to modules/css/whatever - Use with care
-     #- ./assets/custom:/assets/custom
-     ### Only Enable this if you use Chan_dongle/USB modem.
-     #- /dev:/dev
+Along with the environment variables from the Base image, below is the complete list of available options that can be used to customize your installation.
 
-    environment:
-      - VIRTUAL_HOST=asterisk.local
-      - VIRTUAL_NETWORK=nginx-proxy
-     ### If you want to connect to the SSL Enabled Container
-     #- VIRTUAL_PORT=443
-     #- VIRTUAL_PROTO=https
-      - VIRTUAL_PORT=80
-      - LETSENCRYPT_HOST=hostname.example.com
-      - LETSENCRYPT_EMAIL=email@example.com
+| Parameter                    | Description                                                                                                     | Default                 |
+|:----------------------------:|:---------------------------------------------------------------------------------------------------------------:|:-----------------------:|
+| `ADMIN_DIRECTORY`            | What folder to access admin panel                                                                               | `/admin`                |
+| `DB_EMBEDDED`                | Allows you to use an internally provided MariaDB Server e.g. `TRUE` or `FALSE`                                  |                         |
+| `DB_HOST`                    | Host or container name of MySQL Server e.g. `freepbx-db`                                                        |                         |
+| `DB_PORT`                    | MySQL Port                                                                                                      | `3306`                  | 
+| `DB_NAME`                    | MySQL Database name e.g. `asterisk`                                                                             |                         |
+| `DB_USER`                    | MySQL Username for above database e.g. `asterisk`                                                               |                         |
+| `DB_PASS`                    | MySQL Password for above database e.g. `password`                                                               |                         |
+| `ENABLE_FAIL2BAN`            | Enable Fail2ban to block the "bad guys"                                                                         | `TRUE`                  |
+| `ENABLE_FOP`                 | Enable Flash Operator Panel                                                                                     | `FALSE`                 |
+| `ENABLE_SSL`                 | Enable HTTPd to serve SSL requests                                                                              | `FALSE`                 |
+| `ENABLE_XMPP`                | Enable XMPP Module with MongoDB                                                                                 | `FALSE`                 |
+| `ENABLE_VM_TRANSCRIBE`       | Enable Voicemail Transcription with IBM Watson                                                                  | `FALSE`                 |
+| `FOP_DIRECTORY`              | What folder to access FOP                                                                                       | `/fop`                  |
+| `HTTP_PORT`                  | HTTP listening port                                                                                             | `80`                    |
+| `HTTPS_PORT`                 | HTTPS listening port                                                                                            | `443`                   |
+| `INSTALL_ADDITIONAL_MODULES` | Comma separated list of modules to additionally install on first container startup                              |                         |
+| `RTP_START`                  | What port to start RTP transmissions                                                                            | `18000`                 |
+| `RTP_FINISH`                 | What port to start RTP transmissions                                                                            | `20000`                 |
+| `UCP_FIRST`                  | Load UCP as web frontpage `TRUE` or `FALSE`                                                                     | `TRUE`                  |
+| `TLS_CERT`                   | TLS certificate to drop in /certs for HTTPS if no reverse proxy                                                 |                         |
+| `TLS_KEY`                    | TLS Key to drop in /certs for HTTPS if no reverse proxy                                                         |                         |
+| `WEBROOT`                    | If you wish to install to a subfolder use this. Example: `/var/www/html/pbx`                                    | `/var/www/html`         |
+| `VM_TRANSCRIBE_APIKEY`       | API Key from Watson [See tutorial](http://nerdvittles.com/?page_id=25616)                                       |                         |
+| `VM_TRANSCRIBE_MODEL`        | Watson Voice Model - See [here](https://cloud.ibm.com/docs/speech-to-text?topic=speech-to-text-models) for list | `en-GB_NarrowbandModel` |
 
-      - ZABBIX_HOSTNAME=freepbx-app
+`ADMIN_DIRECTORY` and `FOP_DIRECTORY` may not work correctly if `WEBROOT` is changed or `UCP_FIRST=FALSE`
 
-      - RTP_START=18000
-      - RTP_FINISH=18100
+If setting `ENABLE_VM_TRANSCRIBE=TRUE` you will need to change the mailcmd in Freepbx voicemail settings to `/usr/bin/watson-transcription` and set the API Key.
 
-     ## Use for External MySQL Server
-      - DB_EMBEDDED=TRUE
+## Networking
 
-     ### These are only necessary if DB_EMBEDDED=FALSE
-     # - DB_HOST=freepbx-db
-     # - DB_PORT=3306
-     # - DB_NAME=asterisk
-     # - DB_USER=asterisk
-     # - DB_PASS=asteriskpass
+The following ports are exposed.
 
-     ### If you are using TLS Support for Apache to listen on 443 in the container drop them in /certs and set these:
-     #- TLS_CERT=cert.pem
-     #- TLS_KEY=key.pem
-     ### Set your desired timezone
-      - TZ= 'TimeZone'
-    restart: always
-    network_mode: "bridge"
+| Port              | Description |
+|:-----------------:|:-----------:|
+| `80`              | HTTP        |
+| `443`             | HTTPS       |
+| `4445`            | FOP         |
+| `4569`            | IAX         |
+| `5060`            | PJSIP       |
+| `5160`            | SIP         |
+| `8001`            | UCP         |
+| `8003`            | UCP SSL     |
+| `8008`            | UCP         |
+| `8009`            | UCP SSL     |
+| `18000-20000/udp` | RTP ports   |
 
-    ### These final lines are for Fail2ban. If you don't want, comment and also add ENABLE_FAIL2BAN=FALSE to your environment
-    cap_add:
-      - NET_ADMIN
-    privileged: true
-```
-# Accessing the USB modem:
+## Fail2Ban
 
-You need to use sudo chmod 777 /dev/ttyUSB* on the host machine. 
-But, this is not persistent after reboot. To make it persistent after boot on your host machine
+For fail2ban rules to kickin, the `security` log level needs to be enable for asterisk `full` log file. This can be done from the Settings > Log File Settings > Log files.
 
-sudo nano /etc/udev/rules.d/92-dongle.rules and add 
-```
-KERNEL=="ttyUSB*"
-MODE="0666"
-OWNER="asterisk"
-GROUP="uucp"
-```
-This will make the permission persistent. Source: https://wiki.e1550.mobi/doku.php?id=troubleshooting#
+# Maintenance
 
-Credits https://github.com/tiredofit/docker-freepbx
+* There seems to be a problem with the CDR Module when updating where it refuses to update when using an external DB Server. If that happens, simply enter the container (as shown below) and execute `upgrade-cdr`, which will download the latest CDR module, apply a tweak, install, and reload the system for you.
+
+# Known Bugs
+
+* When installing Parking Lot or Feature Codes you sometimes get `SQLSTATE[22001]: String data, right truncated: 1406 Data too long for column 'helptext' at row 1`. To resolve login to your SQL server and issue this statement: `alter table featurecodes modify column helptext varchar(500);`
+* If you find yourself needing to update the framework or core modules and experience issues, enter the container and run `upgrade-core` which will truncate the column and auto upgrade the core and framework modules.
+
+# Shell Access
+
+For debugging and maintenance purposes you may want access the containers shell.
+
+    docker exec -it (whatever your container name is e.g. freepbx) bash
+
+# Referemces
+
+* https://hub.docker.com/r/tiredofit/freepbx
+* https://github.com/epandi/tiredofit-freepbx-arm
+* https://freepbx.org/
