@@ -1,8 +1,10 @@
 # FreePBX and Asterisk on Docker (Raspberry Pi 4).
+
 Based on https://github.com/epandi/tiredofit-freepbx-arm 
 Thank you [Dave Conroy](https://github.com/tiredofit).
 
 # Introduction
+
 This will build a container for [FreePBX](https://www.freepbx.org/) - A Voice over IP manager for Asterisk. Upon starting this image it will give you a turn-key PBX system for SIP calling.
 
     Latest release FreePBX 16
@@ -153,7 +155,7 @@ For debugging and maintenance purposes you may want access the containers shell.
 
     docker exec -it (whatever your container name is e.g. freepbx) bash
 
-# Referemces
+# References
 
 * https://hub.docker.com/r/tiredofit/freepbx
 * https://github.com/epandi/tiredofit-freepbx-arm
