@@ -1,4 +1,48 @@
-# FreePBX 15, Asterisk 17/18 on Docker (Raspberry Pi). 
+# FreePBX and Asterisk on Docker (Raspberry Pi 4).
+
+Based on https://github.com/epandi/tiredofit-freepbx-arm 
+Thank you [Dave Conroy](https://github.com/tiredofit).
+
+# Introduction
+
+This will build a container for [FreePBX](https://www.freepbx.org/) - A Voice over IP manager for Asterisk. Upon starting this image it will give you a turn-key PBX system for SIP calling.
+
+    Latest release FreePBX 16
+    Latest release Asterisk 18
+    Choice of running embedded database or modifies to support external MariaDB Database and only require one DB.
+    Supports data persistence
+    Fail2Ban installed to block brute force attacks
+    Ubuntu base w/ Apache2
+    NodeJS 10.x
+    Automatically installs User Control Panel and displays at first page
+    Option to Install Flash Operator Panel 2
+    Customizable FOP and Admin URLs
+
+# Authors
+
+- [Dave Conroy](https://github.com/tiredofit)
+
+# Table of Contents
+
+1. [Introduction](#introduction)
+2. [Authors](#authors)
+3. [Table of Contents](#table-of-contents)
+4. [Prerequisites](prerequisites)
+5. [Installation](#installation)
+5.1 [Quick Start](#quick-start)
+6. [Configuration](#configuration)
+6.1 [Data Volumes](#data-volumes)
+6.2 [Environment Variables](#environment-variables)
+6.3 [Networking](#networking)
+7. [Maintenance](#maintenance)
+7.1 [Shell Access](#shell-access)
+8. [References](#references)
+
+# Prerequisites
+
+This image assumes that you are using a reverse proxy such as [jwilder/nginx-proxy](https://github.com/nginx-proxy/nginx-proxy) and optionally the Let's Encrypt Proxy Companion @ https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion in order to serve your pages. However, it will run just fine on it's own if you map appropriate ports.
+
+You will also need an external MySQL/MariaDB container, although it can use an internally provided service (not recommended).
 
 Properly working with IVR and call forwarding to an extension on a Raspberry pi 4 32-bit architecture.
 
@@ -7,6 +51,7 @@ No 2-way sound on outgoing calls but sound is available on inbound calls? Check 
 Check documentation on: https://hub.docker.com/r/tiredofit/freepbx
 
 Changelog:
+01-03-2023 - Builds in https://github.com/elraro/freepbx-asterisk-arm/pkgs/container/freepbx-asterisk-arm
 26-03-2021 - tag 18.15-alpha:
 
 Asterisk 18.3.0
